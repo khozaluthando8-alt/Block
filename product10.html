@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details | KHOZA.IO</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <!-- GSAP Core Only (ScrollTrigger removed) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        body { background: #000; color: #00f2ff; font-family: 'Courier New', monospace; margin: 0; padding: 20px; }
+        .container { max-width: 950px; margin: 0 auto; background: #111; border: 1px solid #00f2ff; padding: 30px; border-radius: 8px; box-shadow: 0 0 20px rgba(0,242,255,0.1); }
+        .back-btn { color: #00f2ff; text-decoration: none; font-size: 0.9rem; border: 1px solid #00f2ff; padding: 5px 10px; border-radius: 4px; transition: 0.3s; display: inline-block; margin-bottom: 20px; }
+        .back-btn:hover { background: #00f2ff; color: #000; }
+        
+        .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        
+        /* GSAP Slider Box */
+        .slider-viewport { 
+            width: 100%; 
+            aspect-ratio: 1 / 1; 
+            border: 1px dashed #00f2ff; 
+            background: #050505; 
+            overflow: hidden;
+            position: relative;
+        }
+        .slider-wrapper { display: flex; height: 100%; }
+        .slider-item { 
+            min-width: 100%; 
+            height: 100%;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .slider-item img { max-width: 90%; max-height: 90%; object-fit: contain; }
+
+        /* Navigation Controls */
+        .slider-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .nav-btn {
+            background: none;
+            border: 1px solid #00f2ff;
+            color: #00f2ff;
+            padding: 5px 15px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 0.7rem;
+        }
+        .nav-btn:hover { background: #00f2ff; color: #000; }
+
+        h1 { margin: 0; text-transform: uppercase; letter-spacing: 2px; color: #fff; }
+        .price { font-size: 2.5rem; color: #00ff88; margin: 20px 0; }
+        .meta { color: #888; font-size: 0.85rem; margin-bottom: 8px; line-height: 1.4; }
+        .label { color: #00f2ff; font-weight: bold; }
+        
+        .buy-button { width: 100%; padding: 18px; background: #00f2ff; color: #000; border: none; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 25px; transition: 0.4s; }
+        .buy-button:hover { background: #fff; box-shadow: 0 0 20px #00f2ff; }
+
+        #debugWindow { margin-top: 30px; background: #000; border: 1px solid #333; padding: 15px; font-size: 0.75rem; color: #666; max-height: 150px; overflow-y: auto; }
+        @media (max-width: 768px) { .product-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="shop.html" class="back-btn"><- RETURN TO MARKETPLACE</a>
+        <div id="productDetail"></div>
+        <div id="debugWindow">> TERMINAL READY...</div>
+    </div>
+
+    <script>
+        const RPC_URL = "https://ethereum-sepolia-rpc.publicnode.com";
+        const CONTRACT_ADDRESS = "0x0E763c0d3bCdFa4f744B9DE3355B67B3A9b262Ba";
+        const GATEWAY = "https://gateway.pinata.cloud/ipfs/";
+        let currentIndex = 0;
+        let totalImages = 0;
+
+        const ABI = [
+            {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"products","outputs":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"address","name":"admin","type":"address"},{"internalType":"string","name":"itemCode","type":"string"},{"internalType":"string","name":"itemName","type":"string"},{"internalType":"uint256","name":"retailPrice","type":"uint256"},{"internalType":"uint256","name":"stockPrice","type":"uint256"},{"internalType":"string","name":"colour","type":"string"},{"internalType":"uint256","name":"quantityAvailable","type":"uint256"},{"internalType":"uint256","name":"totalSold","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"_pId","type":"uint256"}],"name":"getProductImages","outputs":[{"internalType":"string[]","name":"","type":"string[]"}],"stateMutability":"view","type":"function"}
+        ];
+
+        function log(msg) {
+            const win = document.getElementById('debugWindow');
+            win.innerHTML += `<div>> ${msg}</div>`;
+            win.scrollTop = win.scrollHeight;
+        }
+
+        async function loadDetails() {
+            const display = document.getElementById('productDetail');
+            const productId = localStorage.getItem("selected_product_id");
+
+            try {
+                const provider = new ethers.JsonRpcProvider(RPC_URL);
+                const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
+                const [p, rawImages] = await Promise.all([
+                    contract.products(productId),
+                    contract.getProductImages(productId)
+                ]);
+
+                const images = rawImages.map(img => img.startsWith('http') ? img : `${GATEWAY}${img}`);
+                totalImages = images.length;
+
+                display.innerHTML = `
+                    <div class="product-grid">
+                        <div class="slider-container">
+                            <div class="slider-viewport">
+                                <div class="slider-wrapper" id="sliderWrapper">
+                                    ${images.map(src => `<div class="slider-item"><img src="${src}"></div>`).join('')}
+                                </div>
+                            </div>
+                            <div class="slider-nav">
+                                <button class="nav-btn" onclick="moveSlider(-1)">PREV_LAYER</button>
+                                <span id="imgCounter" style="font-size:0.7rem">01 / ${totalImages}</span>
+                                <button class="nav-btn" onclick="moveSlider(1)">NEXT_LAYER</button>
+                            </div>
+                        </div>
+                        <div class="product-info">
+                            <p class="meta"><span class="label">ID_NODE:</span> ${p.itemCode}</p>
+                            <h1>${p.itemName}</h1>
+                            <p class="price">R${p.retailPrice.toString()}</p>
+                            <p class="meta"><span class="label">COLOR:</span> ${p.colour}</p>
+                            <button class="buy-button">INITIALIZE PURCHASE</button>
+                        </div>
+                    </div>
+                `;
+                log("Blockchain Link Established.");
+            } catch (err) { log("Sync Error: " + err.message); }
+        }
+
+        function moveSlider(direction) {
+            currentIndex += direction;
+            if (currentIndex < 0) currentIndex = totalImages - 1;
+            if (currentIndex >= totalImages) currentIndex = 0;
+
+            // Pure GSAP Animation (No ScrollTrigger)
+            gsap.to("#sliderWrapper", {
+                xPercent: -100 * currentIndex,
+                duration: 0.5,
+                ease: "power2.inOut"
+            });
+
+            document.getElementById('imgCounter').innerText = `${(currentIndex + 1).toString().padStart(2, '0')} / ${totalImages}`;
+        }
+
+        window.onload = loadDetails;
+    </script>
+</body>
+</html>

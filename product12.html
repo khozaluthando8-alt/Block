@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self'; 
+    script-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline'; 
+    style-src 'self' 'unsafe-inline'; 
+    connect-src 'self' https://ethereum-sepolia-rpc.publicnode.com https://eth-sepolia.g.alchemy.com;
+    img-src 'self' data: https://gateway.pinata.cloud https://*.ipfs.w3s.link;
+     ">
+    <title>Product Details | KHOZA.IO</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <script src="cart-logic.js"></script>
+    <link rel="stylesheet" href="product.css">
+</head>
+<body>
+
+    <header class="shop-header">
+        <div class="header-content">
+            <img src="301015489_443828151102927_1957794053294967618_n.png" alt="KHOZA Logo" class="logo">
+            <div class="status-info">
+                <h1>Khoza Node Visualizer</h1>
+                <p id="connectionStatus">SECURE_LINK: ACTIVE</p>
+            </div>
+            <a href="cart10.html" class="cart-link">
+                CART: [<span id="cartCount">0</span>]
+            </a>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="productDetail">
+            <!-- Content injected by JS -->
+        </div>
+    </main>
+
+    <footer class="shop-footer">
+        <p>&copy; 2026 KHOZA.IO - Durban Logistics Center[cite: 1]</p>
+    </footer>
+
+    <script src="product12.js" > </script>
+</body>
+</html>

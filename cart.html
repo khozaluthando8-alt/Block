@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Cart | KHOZA.IO</title>
+    <link rel="stylesheet" href="style2.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <script src="cart-logic.js"></script>
+    <script src="marketplace-logic.js"></script> <!-- For ABI and Contract info -->
+</head>
+<body>
+    <header class="shop-header">
+        <h1>Your Secure Cart</h1>
+        <a href="shop.html">Back to Shop</a>
+    </header>
+
+    <main class="product-view-container">
+        <div id="cartDisplay" class="product-glass-layout">
+            <!-- Cart Items Rendered Here -->
+        </div>
+        
+        <div class="cart-summary product-glass-layout" style="margin-top: 20px;">
+            <h3>Order Finalization</h3>
+            <div id="cartTotals"></div>
+            <!-- Updated to pass the total with shipping to the processor -->
+            <button class="buy-button" onclick="processBulkOrder()">EXECUTE BULK ORDER</button>
+        </div>
+    </main>
+
+    <script>
+        function renderCartPage() {
+            const cart = getCart(); // From cart-logic.js
+            const display = document.getElementById('cartDisplay');
+            const totalsDisplay = document.getElementById('cartTotals');
+            
+            if (cart.length === 0) {
+                display.innerHTML = "<p>Your cart is empty.</p>";
+                totalsDisplay.innerHTML = "";
+                return;
+            }
+
+            let totalItemsPrice = 0;
+            let totalShippingPrice = 0;
+
+            display.innerHTML = cart.map((item, index) => {
+                const itemSubtotal = item.price * item.quantity;
+                totalItemsPrice += itemSubtotal;
+                
+                // Add the shipping fee saved from the product page
+                totalShippingPrice += (item.shipping || 0);
+
+                return `
+                    <div class="cart-item" style="display:flex; align-items:center; border-bottom:1px solid #444; padding:15px;">
+                        <img src="${item.image}" width="60" style="border-radius:5px; margin-right:15px;">
+                        <div style="flex-grow: 1;">
+                            <h4 style="margin:0;">${item.name}</h4>
+                            <p style="margin:5px 0; color:#aaa; font-size:0.9rem;">
+                                Qty: ${item.quantity} | Location: ${item.location || 'Standard'}
+                            </p>
+                            <p style="margin:0;">Item: R${itemSubtotal.toLocaleString()} | Delivery: R${(item.shipping || 0).toLocaleString()}</p>
+                        </div>
+                        <button onclick="removeFromCart(${index})" style="background:#ff4444; color:white; border:none; padding:8px 12px; border-radius:4px; cursor:pointer;">Remove</button>
+                    </div>
+                `;
+            }).join('');
+
+            const finalTotal = totalItemsPrice + totalShippingPrice;
+
+            totalsDisplay.innerHTML = `
+                <div style="padding:10px 0;">
+                    <div style="display:flex; justify-content:space-between;"><span>Items Subtotal:</span><span>R${totalItemsPrice.toLocaleString()}</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span>Total Delivery:</span><span>R${totalShippingPrice.toLocaleString()}</span></div>
+                    <hr style="border:0; border-top:1px solid #555; margin:10px 0;">
+                    <div style="display:flex; justify-content:space-between; font-size:1.2rem; font-weight:bold;">
+                        <span>Final Total:</span><span>R${finalTotal.toLocaleString()}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+     async function processBulkOrder() {
+    const cart = getCart();
+    if (cart.length === 0) return alert("Cart is empty");
+
+    const orderStatus = document.getElementById('cartTotals');
+    orderStatus.innerHTML = "<h4>Status: Transmitting to Ledger...</h4>";
+
+    try {
+        const userKey = localStorage.getItem("user_session_key");
+        const provider = new ethers.JsonRpcProvider(RPC_URL);
+        const wallet = new ethers.Wallet(userKey, provider);
+        const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, wallet);
+
+        // Generate a master reference for the entire session
+        const masterRef = "KHOZA-" + Math.floor(Math.random() * 1000000);
+        
+        for (let item of cart) {
+            console.log(`Processing item: ${item.name}`);
+            // Appending the masterRef to the item details for tracking
+            const tx = await contract.placeOrder(item.id, item.quantity, `${masterRef} | ${item.location}`);
+            await tx.wait();
+        }
+
+        // Store success data for the receipt page
+        localStorage.setItem("last_order_ref", masterRef);
+        clearCart();
+        
+        // Redirect to the success page
+        window.location.href = "success.html";
+    } catch (err) {
+        console.error(err);
+        orderStatus.innerHTML = "<h4 style='color:red;'>System Failure: Ledger Connection Interrupted.</h4>";
+    }
+}
+        window.onload = renderCartPage;
+    </script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thengala</title>
+    <link rel="stylesheet" href="style10.css">
+    <!-- Load GSAP & Ethers -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+</head>
+<body>
+
+    <header class="shop-header">
+        <div class="header-content">
+            <img src="301015489_443828151102927_1957794053294967618_n.png" alt="KHOZA Logo" class="logo">
+            <div class="status-info">
+                <h1>Khoza Global Shop</h1>
+                <p id="connectionStatus">Connecting to secure ledger...</p>
+            </div>
+        </div>
+    </header>
+
+    <main id="productGallery" class="marketplace-grid">
+        <!-- Products injected by marketplace-logic.js -->
+        <div class="loader">loading products....</div>
+    </main>
+
+    <footer class="shop-footer">
+        <p>&copy; 2026 KHOZA.IO - Decentralized e commerce</p>
+    </footer>
+
+    <script src="marketplace-logic.js"></script>
+    <script>
+        // Initialize GSAP Animations after content loads
+        window.addEventListener('load', () => {
+            gsap.registerPlugin(ScrollTrigger);
+            
+            // Animation for cards appearing as you scroll
+            gsap.from(".product-card", {
+                duration: 1,
+                y: 100,
+                opacity: 0,
+                rotationX: -15,
+                stagger: 0.2,
+                scrollTrigger: {
+                    trigger: ".marketplace-grid",
+                    start: "top 80%",
+                }
+            });
+        });
+    </script>
+</body>
+</html>
