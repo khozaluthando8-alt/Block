@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KHOZA.IO | Product Information Ledger</title>
+    
+    <!-- Modern Styling & Component Font Elements -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- External UI Control Systems (CDN-based for mobile/lightweight terminal environments) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.5/ethers.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <style>
+        :root {
+            --bg-deep: #0a0c10;
+            --bg-surface: #121620;
+            --bg-card: #1a2030;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent-glow: #3b82f6;
+            --accent-success: #10b981;
+            --border-line: #262f45;
+            --font-stack: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-stack);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Top Nav Integration Bar */
+        header {
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-line);
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .brand {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--text-main);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .brand span {
+            color: var(--accent-glow);
+        }
+
+        .session-node {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: rgba(59, 130, 246, 0.1);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            font-family: monospace;
+        }
+
+        /* Container Main Structures */
+        main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            transition: color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .back-link:hover {
+            color: var(--accent-glow);
+        }
+
+        /* Split-Pane Product Layout */
+        .product-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-line);
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            opacity: 0; /* Animated into view by GSAP */
+        }
+
+        @media (max-width: 768px) {
+            .product-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding: 1.5rem;
+            }
+        }
+
+        /* Visual Media Cluster Display */
+        .product-media-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .primary-viewport {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background-color: var(--bg-deep);
+            border: 1px solid var(--border-line);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .primary-viewport img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .thumbnail-strip {
+            display: flex;
+            gap: 0.75rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+
+        .thumbnail-strip::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .thumbnail-strip::-webkit-scrollbar-thumb {
+            background: var(--border-line);
+            border-radius: 2px;
+        }
+
+        .thumb-box {
+            width: 80px;
+            height: 60px;
+            border-radius: 6px;
+            border: 2px solid var(--border-line);
+            overflow: hidden;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+        .thumb-box.active {
+            border-color: var(--accent-glow);
+        }
+
+        .thumb-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Product Metadata Information Panel */
+        .product-details-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .meta-header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        .item-code-tag {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--accent-glow);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .price-matrix {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-line);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .price-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        .price-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Inventory Parameter Matrix Grid */
+        .specs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .spec-tile {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border-line);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .spec-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        .spec-data {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .stock-positive {
+            color: var(--accent-success);
+        }
+
+        .stock-critical {
+            color: #ef4444;
+        }
+
+        /* Transaction Action Controls */
+        .action-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .action-btn {
+            background-color: var(--accent-glow);
+            color: white;
+            border: none;
+            padding: 1.2rem;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: filter 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+        }
+
+        .action-btn:hover {
+            filter: brightness(1.15);
+        }
+
+        .action-btn:active {
+            transform: scale(0.99);
+        }
+
+        .action-btn:disabled {
+            background-color: var(--border-line);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* State Interventions (Loading, Errors) */
+        .system-loader {
+            text-align: center;
+            padding: 100px 0;
+            width: 100%;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--border-line);
+            border-top-color: var(--accent-glow);
+            border-radius: 50%;
+            margin: 0 auto 1.5rem auto;
+            animation: spin 1s infinite linear;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation Integration -->
+    <header>
+        <a href="index.html" class="brand">KHOZA<span>.IO</span></a>
+        <div id="sessionDisplay" class="session-node">Securing Node Handshake...</div>
+    </header>
+
+    <!-- Content Workspace Area -->
+    <main>
+        <div class="back-link" onclick="window.location.href='index.html'">
+            &#8592; Return to Inventory Matrix
+        </div>
+
+        <!-- Master Rendering target wrapper -->
+        <div id="viewContainer">
+            <div class="system-loader">
+                <div class="spinner"></div>
+                <p>Querying Cloudflare Edge Ledger...</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Set standard local fallback image reference
+        const FALLBACK_IMAGE = "301015489_443828151102927_1957794053294967618_n.png";
+
+        /**
+         * 1. CORE APP APPLICATION LOADER
+         */
+        async function initProductLedgerView() {
+            const container = document.getElementById('viewContainer');
+            const sessionDisplay = document.getElementById('sessionDisplay');
+
+            try {
+                // A. CONFIRM CRYPTOGRAPHIC KEY SESSION
+                const sessionKey = localStorage.getItem("user_session_key");
+                if (!sessionKey) {
+                    container.innerHTML = `
+                        <div style="text-align:center; padding: 4rem 1rem; border: 1px dashed var(--border-line); border-radius:12px;">
+                            <h3 style="margin-bottom:1rem;">CRYPTOGRAPHIC IDENTITY MISSING</h3>
+                            <p style="color:var(--text-muted); margin-bottom:2rem;">This environment requires a signature connection key.</p>
+                            <button class="action-btn" style="max-width:250px;" onclick="window.location.href='register5.html'">Generate Session Identity</button>
+                        </div>`;
+                    sessionDisplay.innerText = "Identity Status: Unverified";
+                    return;
+                }
+
+                // Reflect computed identity mask back to top status display panel
+                const activeWallet = new ethers.Wallet(sessionKey);
+                sessionDisplay.innerText = `Node Key: ${activeWallet.address.substring(0, 10)}...`;
+
+                // B. RECOVER CHOSEN TARGET CONTRACT POINTER 
+                const selectedId = localStorage.getItem("selected_product_id");
+                if (!selectedId) {
+                    throw new Error("No tracking parameter index pointer established by selection frame.");
+                }
+
+                // C. POLL SECURE EDGE PROXY ENDPOINT
+                const response = await fetch('/api/get-products');
+                const parsed = await response.json();
+
+                if (!response.ok || !parsed.success) {
+                    throw new Error(parsed.error || "System synchronization drop.");
+                }
+
+                // D. EXTRACT SPECIFIC ID MATCH
+                const currentProduct = parsed.data.find(item => item.id === selectedId.toString());
+                if (!currentProduct) {
+                    throw new Error("Target inventory index is unavailable or contains zero tracking quantities.");
+                }
+
+                // E. MOUNT PRODUCT UI
+                renderActiveProductStructure(container, currentProduct);
+
+            } catch (error) {
+                console.error("Ledger Node Error:", error);
+                container.innerHTML = `
+                    <div style="text-align:center; padding: 3rem; color: #ef4444; border: 1px solid rgba(239,68,68,0.2); border-radius:12px; background: rgba(239,68,68,0.05);">
+                        <p style="font-weight:600; margin-bottom:0.5rem;">Ledger Query Interrupted</p>
+                        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">${error.message}</p>
+                        <button class="action-btn" style="max-width:200px; padding:0.6rem; font-size:0.9rem;" onclick="location.reload()">Retry Connection</button>
+                    </div>`;
+            }
+        }
+
+        /**
+         * 2. UI DOM TREE INJECTION
+         */
+        function renderActiveProductStructure(targetNode, item) {
+            // Confirm tracking media parameters exist cleanly 
+            const images = item.images && item.images.length > 0 ? item.images : [FALLBACK_IMAGE];
+            const activeStock = Number(item.stock);
+
+            targetNode.innerHTML = `
+                <div class="product-container" id="animatedLayout">
+                    <!-- Media Cluster Panel -->
+                    <div class="product-media-panel">
+                        <div class="primary-viewport">
+                            <img id="mainViewport" src="${images[0]}" alt="${item.name}" onerror="this.src='${FALLBACK_IMAGE}'">
+                        </div>
+                        <div class="thumbnail-strip">
+                            ${images.map((imgUrl, idx) => `
+                                <div class="thumb-box ${idx === 0 ? 'active' : ''}" onclick="switchActiveMediaView(this, '${imgUrl}')">
+                                    <img src="${imgUrl}" alt="Item image preview node ${idx + 1}" onerror="this.src='${FALLBACK_IMAGE}'">
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Description / Parameter Control Panel -->
+                    <div class="product-details-panel">
+                        <div class="meta-header">
+                            <h1>${item.name}</h1>
+                            <span class="item-code-tag">Catalog Code: ${item.code}</span>
+                            
+                            <div class="price-matrix">
+                                <div class="price-label">Retail Settlement Value</div>
+                                <div class="price-value">R${Number(item.price).toLocaleString()}</div>
+                            </div>
+
+                            <div class="specs-grid">
+                                <div class="spec-tile">
+                                    <div class="spec-title">Ledger Asset ID</div>
+                                    <div class="spec-data" style="font-family: monospace;">#00${item.id}</div>
+                                </div>
+                                <div class="spec-tile">
+                                    <div class="spec-title">Ledger Allocation Status</div>
+                                    <div class="spec-data ${activeStock > 0 ? 'stock-positive' : 'stock-critical'}">
+                                        ${activeStock > 0 ? `${activeStock} Units Live` : 'Depleted'}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Execution Block -->
+                        <div class="action-container">
+                            <button class="action-btn" id="checkoutBtn" ${activeStock === 0 ? 'disabled' : ''} onclick="executePipelineRoute(${item.id})">
+                                ${activeStock > 0 ? 'PROCEED TO CHECKOUT SETTLEMENT' : 'STOCK CONTEXT UNAVAILABLE'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Trigger sleek interface display animations via GSAP
+            gsap.to("#animatedLayout", {
+                opacity: 1,
+                y: -10,
+                duration: 0.6,
+                ease: "power3.out"
+            });
+            
+            setupViewportInteractivity();
+        }
+
+        /**
+         * 3. MEDIA VIEW PORT CONTROL
+         */
+        function switchActiveMediaView(thumbnailElement, targetUrl) {
+            document.querySelectorAll('.thumb-box').forEach(box => box.classList.remove('active'));
+            thumbnailElement.classList.add('active');
+            
+            const viewportImg = document.getElementById('mainViewport');
+            
+            // GSAP transition cross-fade frame sequence
+            gsap.to(viewportImg, {
+                opacity: 0.3,
+                duration: 0.15,
+                onComplete: () => {
+                    viewportImg.src = targetUrl;
+                    gsap.to(viewportImg, { opacity: 1, duration: 0.2 });
+                }
+            });
+        }
+
+        /**
+         * 4. ADVANCED TILT MOUSE INTERACTIVITY
+         */
+        function setupViewportInteractivity() {
+            const viewport = document.querySelector('.primary-viewport');
+            const img = document.getElementById('mainViewport');
+            
+            if(!viewport || !img) return;
+
+            viewport.addEventListener('mousemove', (e) => {
+                const { left, top, width, height } = viewport.getBoundingClientRect();
+                const x = (e.clientX - left) / width;
+                const y = (e.clientY - top) / height;
+                
+                // Slightly offset scale orientation to trace mouse cursor vector bounds
+                gsap.to(img, {
+                    transformOrigin: `${x * 100}% ${y * 100}%`,
+                    scale: 1.15,
+                    duration: 0.4,
+                    ease: "power2.out"
+                });
+            });
+
+            viewport.addEventListener('mouseleave', () => {
+                gsap.to(img, {
+                    scale: 1,
+                    transformOrigin: "center center",
+                    duration: 0.4,
+                    ease: "power2.out"
+                });
+            });
+        }
+
+        /**
+         * 5. ROUTE NAVIGATION TRANSITION
+         */
+        function executePipelineRoute(productId) {
+            console.log("Passing ledger product focus target to checkout container module:", productId);
+            // This ensures your checkout page (e.g., PayFast/Shipping processor) knows exactly what asset is active
+            localStorage.setItem("selected_product_id", productId);
+            window.location.href = "checkout.html";
+        }
+
+        // Initialize script logic thread immediately upon document container initialization
+        window.onload = initProductLedgerView;
+    </script>
+</body>
+</html>
