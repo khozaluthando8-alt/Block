@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Secure Cart | KHOZA.IO</title>
+         <link rel="stylesheet" href="cart.css">
+             <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <script src="marketplace-logic.js"></script> <!-- For ABI and Contract info -->
+        <script src="cart6.js"></script> <!-- For ABI and Contract info -->
+</head>
+<body>
+
+    <header class="shop-header">
+        <div class="header-content">
+            <img src="301015489_443828151102927_1957794053294967618_n.png" alt="LOGO" class="logo">
+            <div class="status-info">
+                <h1 style="margin:0; font-size:1.1rem; color:#0056b3;">Your Secure Cart</h1>
+                <p style="font-size:0.6rem; color:var(--accent-blue)">NETWORK: ACTIVE</p>
+            </div>
+            <a href="shop.html" class="cart-link">BACK TO SHOP</a>
+        </div>
+    </header>
+
+    <main class="container">
+    <div class="glass-panel" id="cartDisplay">
+        </div>
+
+   <form id="payfast-form" action="https://www.payfast.co.za/eng/process" method="post">
+    <input type="hidden" name="merchant_id" value="17018165">
+    <input type="hidden" name="merchant_key" value="bopobata94t5n">
+    
+    <input type="hidden" name="amount" id="pf-amount" value="">
+    <input type="hidden" name="item_name" id="pf-item-name" value="">
+    <input type="hidden" name="m_payment_id" id="pf-payment-id" value=""> <input type="hidden" name="return_url" value="https://yourdomain.com/success.html">
+    <input type="hidden" name="cancel_url" value="https://yourdomain.com/cancel.html">
+
+    <button type="button" onclick="preparePayFastAndSubmit()" class="buy-button">
+        SECURE CHECKOUT VIA PAYFAST
+    </button>
+</form>
+
+</main>
+
+    <footer class="shop-footer">
+        <p>&copy; 2026 KHOZA.IO - Logistics Network [Pinetown/Durban]</p>
+    </footer>
+
+    
+</body>
+</html>

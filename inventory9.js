@@ -1,47 +1,11 @@
-/**
- * GLOBAL MARKETPLACE LOGIC
- * Fetches all products from the Blockchain and displays them randomly.
- */
-
-// 1. Configuration
-//const PINATA_JWT = "PASTE_YOUR_FULL_JWT_HERE"; // Ensure this is the LONG token
-
-// 1. Configuration - Replace with your details
-//const RPC_URL = "https://eth-sepolia.g.alchemy.com/v2/apnIC4FVlS_hAusqPQkDb";
-const PRIVATE_KEY = "0xe8de15cf25e972c28a220f003230e577b50542dd7b0406030041428d8ab741bb"; // Must be funded with testnet ETH
-//const CONTRACT_ADDRESS = "0xc08d3869d2C11AadE44962261431B52A186C95E3";
-
-//const wallet_addre='0x0Cf641c00aB0691A3d76132e649D38d2369340c7'
- //const RPC_URL = "https://eth-hoodi.g.alchemy.com/v2/apnIC4FVlS_hAusqPQkDb";
-//const CONTRACT_ADDRESS = "0x27AEB9e899669A8Ad6A19460054A614e6bAcD17e";
+// Configuration
+const RPC_URL = "https://ethereum-sepolia-rpc.publicnode.com"; 
+const CONTRACT_ADDRESS = "0x5FC196d4379A8c555866d665191f58a02982c6b3";
+// Pinata API Keys (Get these for free at pinata.cloud)
 const PINATA_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI4NmExODhkYy01ZGJmLTQwMjItOTliMC0wNmFiNTk4Nzg2NjMiLCJlbWFpbCI6Imtob3phbHV0aGFuZG84QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6IkZSQTEifSx7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6Ik5ZQzEifV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiJiY2M5YTA2ZmU0ZDM5YjZmMDg4ZCIsInNjb3BlZEtleVNlY3JldCI6ImE3YTY2NWI2ODBiYWJmNjIyNmZkYjdkNGIzMTc4Y2JhMGVmZjUwNTBkNzhlNjg3ZDZhODUxMmY3Y2I0MGU5NTUiLCJleHAiOjE4MDg2NjA3OTF9.KCYCXSVX8-qNzoeXVYsDt3Fn1OZeEAnkSC5cLOxthkE";
-
-// 1. DYNAMIC WALLET LOADING
-// ABI needs to include the product getter
 // ABI for the KhozaLogistics functions
-       const RPC_URL = "https://ethereum-sepolia-rpc.publicnode.com"; 
-//const CONTRACT_ADDRESS = "0x0E763c0d3bCdFa4f744B9DE3355B67B3A9b262Ba";
-         const CONTRACT_ADDRESS = "0xf22Af894a5377D66D8f7E9baFE65E5e5179A9866";
 
-//const PINATA_JWT = "PASTE_YOUR_FULL_JWT_HERE"; // Ensure this is the LONG token
-
-//const CONTRACT_ADDRESS = "0x27AEB9e899669A8Ad6A19460054A614e6bAcD17e";
-      //  const RPC_URL = "https://ethereum-sepolia-rpc.publicnode.com";
-     //   const RPC_URL = "https://ethereum-sepolia-rpc.publicnode.com"; 
-//const CONTRACT_ADDRESS = "0x7b7Fc57F363b9D60038C8b7f8F270e77Ee13dd0C";
-//const PINATA_JWT = "PASTE_YOUR_FULL_JWT_HERE"; // Ensure this is the LONG token
-
-//const CONTRACT_ADDRESS = "0x27AEB9e899669A8Ad6A19460054A614e6bAcD17e";
-      //  const RPC_URL = "https://ethereum-sepolia-rpc.publicnode.com";
-//const RPC_URL = "https://eth-hoodi.g.alchemy.com/v2/apnIC4FVlS_hAusqPQkDb";
-
-         // 2. Access variables via process.env
-      //  const RPC_URL = process.env.RPC_URL;
-         //const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS;
-     //  const MASTER_KEY = process.env.MASTER_KEY;
-
-       
-          const ABI = [
+        const ABI =[
   {
     "inputs": [],
     "stateMutability": "nonpayable",
@@ -51,95 +15,19 @@ const PINATA_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24
     "anonymous": false,
     "inputs": [
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "adminId",
-        "type": "address"
+        "indexed": false,
+        "internalType": "string",
+        "name": "variation",
+        "type": "string"
       },
       {
         "indexed": false,
         "internalType": "string",
-        "name": "storeName",
+        "name": "colour",
         "type": "string"
       }
     ],
-    "name": "AdminRegistered",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "courierId",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "name",
-        "type": "string"
-      }
-    ],
-    "name": "CourierRegistered",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "customerId",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "name",
-        "type": "string"
-      }
-    ],
-    "name": "CustomerRegistered",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "dispatchId",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "name",
-        "type": "string"
-      }
-    ],
-    "name": "DispatchRegistered",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "GasRefueled",
+    "name": "ItemQuantity",
     "type": "event"
   },
   {
@@ -148,20 +36,7 @@ const PINATA_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "orderId",
-        "type": "uint256"
-      }
-    ],
-    "name": "OrderConfirmed",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "orderId",
+        "name": "id",
         "type": "uint256"
       },
       {
@@ -173,7 +48,7 @@ const PINATA_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24
       {
         "indexed": false,
         "internalType": "string",
-        "name": "Reference",
+        "name": "_reference",
         "type": "string"
       }
     ],
@@ -197,69 +72,65 @@ const PINATA_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24
       },
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "admin",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "price",
+        "type": "uint256"
       }
     ],
     "name": "ProductAdded",
     "type": "event"
   },
   {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "productId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "newQuantity",
-        "type": "uint256"
-      }
-    ],
-    "name": "StockUpdated",
-    "type": "event"
-  },
-  {
     "inputs": [
       {
         "internalType": "string",
-        "name": "_c",
+        "name": "_itemCode",
         "type": "string"
       },
       {
         "internalType": "string",
-        "name": "_n",
+        "name": "_itemName",
         "type": "string"
       },
       {
         "internalType": "string[]",
-        "name": "_u",
+        "name": "_urls",
         "type": "string[]"
       },
       {
         "internalType": "uint256",
-        "name": "_r",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_s",
+        "name": "_retail",
         "type": "uint256"
       },
       {
         "internalType": "string",
-        "name": "_col",
+        "name": "_description",
         "type": "string"
       },
       {
         "internalType": "uint256",
-        "name": "_q",
+        "name": "_stockPrice",
         "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "_colour",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_qty",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string[]",
+        "name": "_size",
+        "type": "string[]"
+      },
+      {
+        "internalType": "string",
+        "name": "_category",
+        "type": "string"
       }
     ],
     "name": "addProduct",
@@ -346,19 +217,6 @@ const PINATA_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_oId",
-        "type": "uint256"
-      }
-    ],
-    "name": "confirmOrder",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -541,11 +399,6 @@ const PINATA_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24
         "type": "address"
       },
       {
-        "internalType": "string",
-        "name": "description",
-        "type": "string"
-      },
-      {
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
@@ -581,55 +434,6 @@ const PINATA_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "dispatchers",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "adminId",
-        "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "firstName",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "surname",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "deliveryAddress",
-        "type": "string"
-      },
-      {
-        "internalType": "uint256",
-        "name": "phoneNumber",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "email",
-        "type": "string"
-      },
-      {
-        "internalType": "bool",
-        "name": "isActive",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "bytes32",
         "name": "",
         "type": "bytes32"
@@ -647,18 +451,86 @@ const PINATA_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "getCounts",
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_id",
+        "type": "uint256"
+      }
+    ],
+    "name": "getProduct",
     "outputs": [
       {
-        "internalType": "uint256",
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "id",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "admin",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "itemCode",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "itemName",
+            "type": "string"
+          },
+          {
+            "internalType": "string[]",
+            "name": "imageUrls",
+            "type": "string[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "retailPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "stockPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "colour",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "quantityAvailable",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "totalSold",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string[]",
+            "name": "size",
+            "type": "string[]"
+          },
+          {
+            "internalType": "string",
+            "name": "category",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct KhozaLogistics.Product",
         "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
+        "type": "tuple"
       }
     ],
     "stateMutability": "view",
@@ -678,25 +550,6 @@ const PINATA_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24
         "internalType": "string[]",
         "name": "",
         "type": "string[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_u",
-        "type": "address"
-      }
-    ],
-    "name": "getRole",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
       }
     ],
     "stateMutability": "view",
@@ -730,25 +583,6 @@ const PINATA_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24
       }
     ],
     "name": "isCourier",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_a",
-        "type": "address"
-      }
-    ],
-    "name": "isCustomer",
     "outputs": [
       {
         "internalType": "bool",
@@ -816,24 +650,29 @@ const PINATA_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24
         "type": "uint256"
       },
       {
-        "internalType": "uint256",
-        "name": "totalAmount",
-        "type": "uint256"
-      },
-      {
         "internalType": "string",
         "name": "status",
         "type": "string"
       },
       {
-        "internalType": "bool",
-        "name": "isConfirmed",
-        "type": "bool"
+        "internalType": "string",
+        "name": "Reference",
+        "type": "string"
       },
       {
         "internalType": "string",
-        "name": "paymentReference",
+        "name": "description",
         "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "deliveryAddress",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -867,6 +706,16 @@ const PINATA_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24
       {
         "internalType": "string",
         "name": "_ref",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_desc",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_addr",
         "type": "string"
       }
     ],
@@ -943,6 +792,11 @@ const PINATA_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24
         "type": "uint256"
       },
       {
+        "internalType": "string",
+        "name": "description",
+        "type": "string"
+      },
+      {
         "internalType": "uint256",
         "name": "stockPrice",
         "type": "uint256"
@@ -961,6 +815,11 @@ const PINATA_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24
         "internalType": "uint256",
         "name": "totalSold",
         "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "category",
+        "type": "string"
       }
     ],
     "stateMutability": "view",
@@ -970,22 +829,22 @@ const PINATA_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24
     "inputs": [
       {
         "internalType": "string",
-        "name": "_s",
+        "name": "_store",
         "type": "string"
       },
       {
         "internalType": "string",
-        "name": "_b",
+        "name": "_bank",
         "type": "string"
       },
       {
         "internalType": "string",
-        "name": "_h",
+        "name": "_holder",
         "type": "string"
       },
       {
         "internalType": "string",
-        "name": "_n",
+        "name": "_acc",
         "type": "string"
       }
     ],
@@ -998,105 +857,36 @@ const PINATA_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24
     "inputs": [
       {
         "internalType": "string",
-        "name": "_f",
+        "name": "_ref",
         "type": "string"
       },
       {
         "internalType": "string",
-        "name": "_v",
+        "name": "_fn",
         "type": "string"
       },
       {
         "internalType": "string",
-        "name": "_e",
-        "type": "string"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_p",
-        "type": "uint256"
-      }
-    ],
-    "name": "registerCourier",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "_n",
+        "name": "_sn",
         "type": "string"
       },
       {
         "internalType": "string",
-        "name": "_r",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_a",
+        "name": "_addr",
         "type": "string"
       },
       {
         "internalType": "uint256",
-        "name": "_p",
+        "name": "_ph",
         "type": "uint256"
       },
       {
         "internalType": "string",
-        "name": "_e",
+        "name": "_em",
         "type": "string"
       }
     ],
     "name": "registerCustomer",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "_f",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_s",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_a",
-        "type": "string"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_p",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "_e",
-        "type": "string"
-      }
-    ],
-    "name": "registerDispatch",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address payable",
-        "name": "_user",
-        "type": "address"
-      }
-    ],
-    "name": "requestGasRefuel",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1143,173 +933,141 @@ const PINATA_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24
     ],
     "stateMutability": "view",
     "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "withdrawGasVault",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "stateMutability": "payable",
-    "type": "receive"
   }
-];  
-
-// 1. DYNAMIC SESSION RETRIEVAL
-// This looks for the key saved in customer-register3.html or login.html
+];
 
 
-  
+const SESSION_KEY = localStorage.getItem("admin_session_key");
+const provider = new ethers.JsonRpcProvider(RPC_URL);
+const wallet = new ethers.Wallet(SESSION_KEY, provider);
+const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, wallet);
+
+async function uploadToIPFS(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${PINATA_JWT}` },
+        body: formData
+    });
+    const json = await res.json();
+    return `https://gateway.pinata.cloud/ipfs/${json.IpfsHash}`;
+}
+
+// ... existing configuration (RPC_URL, CONTRACT_ADDRESS, etc.) ...
 
 /**
- * GLOBAL MARKETPLACE LOGIC - KHOZA.IO
- * Fetches all products from the Blockchain and displays them randomly.
+ * Automatically calculates total stock from the variation string
+ * Example: _XL(10), _M(15) -> Total: 25
  */
+// --- DYNAMIC VARIATION LOGIC ---
 
+// 1. Function to add a new color row
+document.getElementById('addVarBtn').addEventListener('click', () => {
+    const container = document.getElementById('variationsContainer');
+    const firstRow = document.querySelector('.variation-row');
+    const newRow = firstRow.cloneNode(true);
+    
+    // Clear inputs in the new row
+    newRow.querySelectorAll('input').forEach(input => input.value = '');
+    newRow.querySelector('.row-qty').innerText = '0';
+    
+    container.appendChild(newRow);
+});
 
-  async function loadRandomMarketplace() {
-    const gallery = document.getElementById('productGallery');
-    const headerStatus = document.querySelector('.shop-header p');
+// 2. Updated calculation logic to sum all rows
+function calculateGrandTotal() {
+    const rows = document.querySelectorAll('.variation-row');
+    let grandTotal = 0;
 
+    rows.forEach(row => {
+        const sizeInput = row.querySelector('.vSizes').value;
+        const matches = sizeInput.match(/\(([^)]+)\)/g);
+        let rowTotal = 0;
+
+        if (matches) {
+            matches.forEach(match => {
+                const num = parseInt(match.replace('(', '').replace(')', ''));
+                if (!isNaN(num)) rowTotal += num;
+            });
+        }
+        row.querySelector('.row-qty').innerText = rowTotal;
+        grandTotal += rowTotal;
+    });
+
+    document.getElementById('qtyDisplay').innerText = grandTotal;
+    document.getElementById('finalQty').value = grandTotal;
+}
+
+// 3. Updated Sync Logic to handle multiple variations
+async function syncInventoryToBlockchain(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    
     try {
-      
+        btn.disabled = true;
+        
+        // Collect Global Data
+        const itemCode = document.getElementById('itemCode').value;
+        const itemName = document.getElementById('itemName').value;
+        const category = document.getElementById('itemCategory').value;
+        const description = document.getElementById('itemDesc').value;
+        const retail = BigInt(document.getElementById('pRetail').value);
+        const stock = BigInt(document.getElementById('pStock').value);
 
-        // B. ETHERS SETUP
-        const provider = new ethers.JsonRpcProvider(RPC_URL);
-      //  const wallet = new ethers.Wallet(userKey, provider);
-        const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
-
-        // C. CUSTOMER GREETING
-       
-        // D. DATA HARVESTING
-      // D. DATA HARVESTING - Updated to fetch images separately
-        const count = await contract.productCount(); 
-        let allProducts = [];
-
-        for (let i = 1; i <= count; i++) {
-            // Fetch product basic info
-            const p = await contract.products(i);
-            
-            // Fetch images using the dedicated getter in your ABI
-            const images = await contract.getProductImages(i);
-            
-            // Only show active stock
-            if (p.quantityAvailable > 0) {
-                allProducts.push({
-                    id: p.id.toString(),
-                    name: p.itemName,
-                    code: p.itemCode,
-                    price: p.retailPrice.toString(),
-                    stockPrice: p.stockPrice.toString(),
-                    // Assign the fetched image array here
-                    images: images, 
-                    stock: p.quantityAvailable.toString()
-                });
+        // Upload Images once for all variations
+        btn.innerText = "Uploading Images...";
+        const imageInputs = document.querySelectorAll('.product-image-input');
+        let urls = [];
+        for (let input of imageInputs) {
+            if (input.files[0]) {
+                const url = await uploadToIPFS(input.files[0]);
+                urls.push(url);
             }
         }
-        // E. RANDOMIZATION (Fisher-Yates)
-        for (let i = allProducts.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [allProducts[i], allProducts[j]] = [allProducts[j], allProducts[i]];
+
+        // Loop through each Colour/Size row and create a transaction
+        const rows = document.querySelectorAll('.variation-row');
+        for (let i = 0; i < rows.length; i++) {
+            const color = rows[i].querySelector('.vColour').value;
+            const sizeString = rows[i].querySelector('.vSizes').value;
+            const sizeArray = sizeString.split(',').map(s => s.trim());
+            const rowQty = BigInt(rows[i].querySelector('.row-qty').innerText);
+
+            btn.innerText = `Syncing Variation ${i + 1}/${rows.length} (${color})...`;
+
+            /** Matching cfw.sol parameters  */
+            const tx = await contract.addProduct(
+                itemCode,
+                itemName,
+                urls,
+                retail,
+                description,
+                stock,
+                color,
+                rowQty,
+                sizeArray,
+                category
+            );
+            await tx.wait();
         }
 
-        // F. RENDER
-        renderGallery(allProducts);
+        alert("All variations synced successfully!");
+        location.reload();
 
     } catch (err) {
-        console.error("Critical System Failure:", err);
-        gallery.innerHTML = "<p style='color:red;'>CONNECTION TO LEDGER FAILED. REFRESHING...</p>";
+        console.error(err);
+        alert("Sync Failed: " + (err.reason || err.message));
+        btn.disabled = false;
+        btn.innerText = "Upload Product & Sync Chain";
     }
 }
 
-/**
- * 4. UI Rendering
- * Generates the HTML for the product cards.
- */
-/**
- * 4. UI Rendering
- * Updated with safety check for images to prevent 'undefined (reading 0)' error.
- */
-function renderGallery(products) {
-    const gallery = document.getElementById('productGallery');
-    if (products.length === 0) {
-        gallery.innerHTML = "<p>MARKETPLACE EMPTY: NO ACTIVE STOCK FOUND.</p>";
-        return;
+
+// Initial Run and Event Listeners
+window.addEventListener('load', () => {
+    const form = document.getElementById('addItemForm');
+    if (form) {
+        form.addEventListener('submit', syncInventoryToBlockchain);
     }
-
-    // Use your local logo file as the reliable fallback
-    const localFallback = "301015489_443828151102927_1957794053294967618_n.png";
-
-    gallery.innerHTML = products.map(p => {
-        // Check if images exist and the first URL is not an empty string
-        const hasImage = p.images && p.images.length > 0 && p.images[0] !== "";
-        const displayImage = hasImage ? p.images[0] : localFallback;
-
-        return `
-            <div class="product-card">
-                <div class="card-image">
-                    <!-- Added onerror handler to catch broken IPFS links and swap to local fallback -->
-                    <img src="${displayImage}" 
-                         alt="${p.name}" 
-                         onerror="this.src='${localFallback}'">
-                </div>
-                <div class="card-info">
-                    <h3>${p.name}</h3>
-                    <p class="price">R${Number(p.price).toLocaleString()}</p>
-                    <p class="store-tag">CODE: ${p.code}</p>
-                    <p class="meta">Available: ${p.stock} units</p>
-                    <button onclick="openProduct(${p.id})">VIEW ITEM</button>
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    // Re-initialize GSAP tilt effects for the new cards[cite: 8]
-    applyCardAnimations();
-}
-
-/**
- * 6. UI Animations
- * Applies GSAP tilt effects to product cards after they are rendered.
- */
-function applyCardAnimations() {
-    const cards = document.querySelectorAll('.product-card');
-    
-    cards.forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-            const { clientX, clientY } = e;
-            const { left, top, width, height } = card.getBoundingClientRect();
-            const x = (clientX - left) / width - 0.5;
-            const y = (clientY - top) / height - 0.5;
-
-            gsap.to(card, {
-                rotationY: x * 20, // Tilt left/right
-                rotationX: -y * 20, // Tilt up/down
-                ease: "power2.out",
-                duration: 0.4
-            });
-        });
-
-        card.addEventListener('mouseleave', () => {
-            gsap.to(card, { 
-                rotationX: 0, 
-                rotationY: 0, 
-                ease: "power2.out" 
-            });
-        });
-    });
-}
-/**
- * 5. Navigation Logic
- * Bridges the shop to the individual product page.
- */
-function openProduct(productId) {
-    console.log("Routing to product node:", productId);
-    localStorage.setItem("selected_product_id", productId);
-    window.location.href = "product12.html";
-}
-
-// Initialize on window load
-window.onload = loadRandomMarketplace;
+});

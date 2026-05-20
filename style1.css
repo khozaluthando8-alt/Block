@@ -1,0 +1,215 @@
+/* Registration Page Specifics */
+
+/* Core Colors */
+:root {
+    --glass-blue: rgba(173, 216, 230, 0.4); /* Transparent Light Blue */
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --text-navy: #002d5d;
+}
+
+body.reg-body {
+    background: #ffffff;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Blended Header Logic */
+.blended-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    padding: 10px 40px;
+    background: var(--glass-blue);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid var(--glass-border);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+}
+
+.logo-wrapper {
+    position: relative;
+    padding: 5px;
+}
+
+/* Blending the logo into the glass background */
+.blended-logo {
+    height: 70px;
+    border-radius: 12px;
+    /* Soft shadow to make it feel like it's inside the glass */
+    filter: drop-shadow(0 0 5px rgba(0, 123, 255, 0.2)); 
+    transition: transform 0.3s ease;
+}
+
+.header-text {
+    margin-left: 20px;
+}
+
+.header-text h1 {
+    font-size: 1.4rem;
+    margin: 0;
+    color: var(--text-navy);
+}
+
+.header-text p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #007bff;
+    letter-spacing: 1px;
+}
+
+/* Blended Footer */
+.blended-footer {
+    padding: 20px;
+    background: var(--glass-blue);
+    backdrop-filter: blur(15px);
+    border-top: 1px solid var(--glass-border);
+    text-align: center;
+    color: var(--text-navy);
+    font-size: 0.9rem;
+    margin-top: auto;
+}
+
+/* The Form Card (Glassmorphism) */
+.reg-container {
+    padding: 60px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 30px;
+    padding: 40px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+}
+
+/* UI Elements */
+input {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.9);
+}
+
+.reg-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #007bff, #00c6ff);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(0, 123, 255, 0.2);
+}
+
+/* Mobile Tweak */
+@media (max-width: 600px) {
+    .blended-header {
+        padding: 10px 20px;
+    }
+    .blended-logo {
+        height: 50px;
+    }
+}
+.reg-body {
+    background: #ffffff; /* White body as requested */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.reg-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+/* Central Glass Card */
+.glass-card {
+    background: rgba(173, 216, 230, 0.15); /* Very light blue tint */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 123, 255, 0.2);
+    border-radius: 25px;
+    padding: 40px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+}
+
+.glass-card h2 {
+    text-align: center;
+    color: #0056b3;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Form Elements */
+.input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 15px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    transition: 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 10px rgba(0,123,255,0.1);
+}
+
+.reg-btn {
+    width: 100%;
+    padding: 16px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.reg-btn:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+}
+
+/* Mobile Adjustments */
+@media (max-width: 480px) {
+    .input-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    .glass-card {
+        padding: 25px;
+    }
+}

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart | KHOZA.IO</title>
+    <link rel="stylesheet" href="style2.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <script src="cart-logic.js"></script>
+    <script src="cart6.js"></script>
+</head>
+<body>
+    <header class="shop-header">
+        <h1>Your Secure Cart</h1>
+        <a href="shop.html">Back to Shop</a>
+    </header>
+
+    <main class="product-view-container">
+        <div id="cartDisplay" class="glass-panel" style="margin-bottom: 20px;">
+            </div>
+
+        <div id="cartTotals" class="glass-panel" style="margin-bottom: 20px; padding: 20px;">
+            </div>
+
+        <div class="glass-panel">
+            <h3 style="margin-top:0;">Payment Method</h3>
+            
+            <div class="payment-options" style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 10px; cursor: pointer;">
+                    <input type="radio" name="payMethod" value="payfast" checked onchange="togglePaymentUI()"> 
+                    <strong>Online (PayFast - Card/EFT)</strong>
+                </label>
+                
+                <label style="display: block; cursor: pointer;">
+                    <input type="radio" name="payMethod" value="cod" onchange="togglePaymentUI()"> 
+                    <strong>Cash on Delivery (Durban Only)</strong>
+                </label>
+            </div>
+
+            <div id="payfast-container">
+                <form id="payfast-form" action="https://www.payfast.co.za/eng/process" method="post">
+                    <input type="hidden" name="merchant_id" id="pf-merchant-id" value="17018165">
+                    <input type="hidden" name="merchant_key" id="pf-merchant-key" value="bopobata94t5n">
+                    <input type="hidden" name="amount" id="pf-amount">
+                    <input type="hidden" name="item_name" id="pf-item-name">
+                    <input type="hidden" name="m_payment_id" id="pf-payment-id">
+                    
+                    <button type="button" onclick="preparePayFastAndSubmit()" class="buy-button">
+                        PAY VIA PAYFAST
+                    </button>
+                </form>
+            </div>
+
+            <div id="cod-container" style="display: none;">
+                <p style="font-size: 0.75rem; color: #666; margin-bottom: 10px;">
+                    * You will pay the driver in cash upon delivery. A copy of this order will be logged to the KHOZA ledger.
+                </p>
+                <button type="button" onclick="processCODOrder()" class="buy-button" style="background: #28a745;">
+                    CONFIRM CASH ON DELIVERY
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Run on page load
+        window.onload = function() {
+            renderCartPage();
+            // Initial UI state
+            togglePaymentUI();
+        };
+    </script>
+
+    <script>
+
+        // Function to generate a unique Order Reference
+function generateOrderRef() {
+    const prefix = "KHZ";
+    const random = Math.floor(1000 + Math.random() * 9000); // 4 random digits
+    const timestamp = Date.now().toString().slice(-4); // Last 4 digits of timestamp
+    return `${prefix}-${random}-${timestamp}`;
+}
+
+
+       // Inside cart_2.html - Updated renderCartPage function
+function renderCartPage() {
+    const cart = getCart(); // From cart-logic_2.js
+    const display = document.getElementById('cartDisplay');
+    const totalsDisplay = document.getElementById('cartTotals');
+    
+    if (cart.length === 0) {
+        display.innerHTML = "<p>Your node cart is empty.</p>";
+        totalsDisplay.innerHTML = "";
+        return;
+    }
+
+    let totalItemsPrice = 0;
+    let totalQty = 0;
+    let primaryLocation = cart[0].location || "Standard";
+
+    display.innerHTML = cart.map((item, index) => {
+        const itemSubtotal = item.price * item.quantity;
+        totalItemsPrice += itemSubtotal;
+        totalQty += item.quantity;
+
+        return `
+            <div class="cart-item" style="display:flex; align-items:center; border-bottom:1px solid #444; padding:15px;">
+                <img src="${item.image}" width="60" style="border-radius:5px; margin-right:15px;">
+                <div style="flex-grow: 1;">
+                    <h4 style="margin:0;">${item.name}</h4>
+                    <p style="margin:5px 0; color:#aaa; font-size:0.8rem;">
+                        Qty: ${item.quantity} | Variants: ${item.variant}
+                    </p>
+                    <p style="margin:0;">Subtotal: R${itemSubtotal.toLocaleString()}</p>
+                </div>
+                <button onclick="removeFromCart(${index})" style="background:#ff4444; color:white; border:none; padding:8px 12px; border-radius:4px; cursor:pointer;">Remove</button>
+            </div>
+        `;
+    }).join('');
+
+    // Consolidated Logistics Logic (Applied once for the whole cart)
+    const rates = { 
+        "Durban CBD": [40, 60, 100, 180], 
+        "Parlock": [50, 70, 110, 190], 
+        "Pinetown": [70, 100, 170, 230], 
+        "Standard": [60, 100, 180, 240] 
+    };
+    
+    const s = rates[primaryLocation] || rates["Standard"];
+    let deliveryFee = s[0];
+    if (totalQty > 4) deliveryFee = s[1];
+    if (totalQty > 10) deliveryFee = s[2];
+    if (totalQty > 20) deliveryFee = s[3];
+
+    const finalTotal = totalItemsPrice + deliveryFee;
+
+    totalsDisplay.innerHTML = `
+        <div style="padding:10px 0;">
+            <div style="display:flex; justify-content:space-between;"><span>Items Total (${totalQty} units):</span><span>R${totalItemsPrice.toLocaleString()}</span></div>
+            <div style="display:flex; justify-content:space-between; color:#007bff;">
+                <span>Consolidated Delivery (${primaryLocation}):</span>
+                <span>R${deliveryFee.toLocaleString()}</span>
+            </div>
+            <hr style="border:0; border-top:1px solid #555; margin:10px 0;">
+            <div style="display:flex; justify-content:space-between; font-size:1.4rem; font-weight:bold; color:white;">
+                <span>TOTAL DUE:</span><span>R${finalTotal.toLocaleString()}</span>
+            </div>
+        </div>
+    `;
+}
+       window.onload = () => {
+    renderCartPage(); // Draws the cart items
+    //updateBadge();    // Updates the header count
+};
+    </script>
+</body>
+</html>
